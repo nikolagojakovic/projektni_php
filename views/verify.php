@@ -1,12 +1,13 @@
 <div class="auth-card">
     <div class="auth-logo">
-        <span class="auth-logo-icon">💬</span>
-        <span class="auth-logo-name">ChatApp</span>
+        <div class="auth-logo-mark">💬</div>
+        <span class="auth-logo-name">MojChat</span>
     </div>
-    <h1 class="auth-title">Verify your email</h1>
+
+    <h1 class="auth-title">Potvrdi email</h1>
     <p class="auth-subtitle">
-        We sent a 6-digit code to
-        <strong><?= htmlspecialchars($pendingEmail, ENT_QUOTES, 'UTF-8') ?></strong>
+        Poslali smo kod na
+        <strong style="color: var(--text);"><?= htmlspecialchars($pendingEmail, ENT_QUOTES, 'UTF-8') ?></strong>
     </p>
 
     <?php if (!empty($errors)): ?>
@@ -28,7 +29,7 @@
         <?= csrfInput() ?>
 
         <div class="form-group">
-            <label for="code">Verification Code</label>
+            <label for="code">6-cifreni kod</label>
             <input
                 type="text"
                 id="code"
@@ -43,16 +44,18 @@
             >
         </div>
 
-        <button type="submit" class="btn-primary">Verify Email</button>
+        <button type="submit" class="btn-primary">Potvrdi →</button>
     </form>
 
-    <form method="POST" action="/verify/resend" style="margin-top: 1rem;">
+    <div class="auth-divider"></div>
+
+    <form method="POST" action="/verify/resend">
         <?= csrfInput() ?>
-        <p class="auth-footer" style="margin-bottom: 0.5rem;">Didn't receive it?</p>
-        <button type="submit" class="btn-secondary">Resend code</button>
+        <p class="auth-footer" style="margin-bottom: 0.625rem;">Nisi dobio kod?</p>
+        <button type="submit" class="btn-secondary">Pošalji ponovo</button>
     </form>
 
-    <p class="auth-footer" style="margin-top: 1.25rem;">
-        <a href="/register" class="btn-link">← Use a different email</a>
+    <p class="auth-footer" style="margin-top: 1rem;">
+        <a href="/register" class="btn-link">← Koristi drugi email</a>
     </p>
 </div>

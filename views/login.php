@@ -1,13 +1,14 @@
 <div class="auth-card">
     <div class="auth-logo">
-        <span class="auth-logo-icon">💬</span>
-        <span class="auth-logo-name">ChatApp</span>
+        <div class="auth-logo-mark">💬</div>
+        <span class="auth-logo-name">MojChat</span>
     </div>
-    <h1 class="auth-title">Welcome back</h1>
-    <p class="auth-subtitle">Sign in to your account</p>
+
+    <h1 class="auth-title">Dobrodošao nazad</h1>
+    <p class="auth-subtitle">Prijavi se na svoj nalog</p>
 
     <?php if ($verified): ?>
-        <div class="alert alert-success">Email verified! You can now sign in.</div>
+        <div class="alert alert-success">✓ Email potvrđen! Možeš se prijaviti.</div>
     <?php endif; ?>
 
     <?php if (!empty($errors)): ?>
@@ -27,26 +28,27 @@
                 name="email"
                 maxlength="255"
                 value="<?= htmlspecialchars($formData['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
-                placeholder="you@example.com"
+                placeholder="ti@primer.com"
                 autocomplete="email"
                 required
             >
         </div>
 
         <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password">Lozinka</label>
             <input
                 type="password"
                 id="password"
                 name="password"
-                placeholder="Your password"
+                placeholder="Tvoja lozinka"
                 autocomplete="current-password"
                 required
             >
         </div>
 
-        <button type="submit" class="btn-primary">Sign in</button>
+        <button type="submit" class="btn-primary">Prijavi se →</button>
     </form>
 
-    <p class="auth-footer">New here? <a href="/register" class="btn-link">Create an account</a></p>
+    <div class="auth-divider"></div>
+    <p class="auth-footer">Nemaš nalog? <a href="/register" class="btn-link">Registruj se</a></p>
 </div>

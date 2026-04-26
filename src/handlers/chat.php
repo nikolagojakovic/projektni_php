@@ -6,7 +6,7 @@ requireAuth();
 
 $user = currentUser();
 
-$pageTitle = 'Chat — ChatApp';
+$pageTitle = 'Ćaskanje — MojChat';
 $bodyClass = 'chat-page';
 ob_start();
 require VIEWS . '/chat.php';

@@ -14,7 +14,7 @@ $verified = isset($_GET['verified']) ? true : false;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $csrfToken = $_POST['csrf_token'] ?? '';
     if (!validateCsrfToken($csrfToken)) {
-        $errors[] = 'Invalid request. Please try again.';
+        $errors[] = 'Nevažeći zahtev. Pokušaj ponovo.';
     } else {
         $email    = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $formData = ['email' => $email];
 
         if ($email === '' || $password === '') {
-            $errors[] = 'Please enter your email and password.';
+            $errors[] = 'Unesi email i lozinku.';
         } else {
             $pdo  = db();
             $stmt = $pdo->prepare('SELECT id, name, email, password_hash, is_verified FROM users WHERE email = ?');
@@ -30,23 +30,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = $stmt->fetch();
 
             if (!$user || !password_verify($password, $user['password_hash'])) {
-                $errors[] = 'Invalid email or password.';
+                $errors[] = 'Pogrešan email ili lozinka.';
             } elseif (!$user['is_verified']) {
-                // Store pending email so they can go verify
                 $_SESSION['pending_email'] = $email;
-                $errors[] = 'Please verify your email first. <a href="/verify">Verify now</a>.';
+                $errors[] = 'Prvo potvrdite vaš email. <a href="/verify">Potvrdi sada</a>.';
             } else {
                 session_regenerate_id(true);
                 $_SESSION['user_id']   = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
-                header('Location: /chat');
+                header('Location: /chat', true, 303);
                 exit;
             }
         }
     }
 }
 
-$pageTitle = 'Login — ChatApp';
+$pageTitle = 'Prijava — MojChat';
 $bodyClass = 'auth-page';
 ob_start();
 require VIEWS . '/login.php';

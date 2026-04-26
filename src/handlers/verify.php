@@ -18,7 +18,7 @@ if ($pendingEmail === '' && $method === 'GET') {
 if ($method === 'POST' && $path === '/verify/resend') {
     $csrfToken = $_POST['csrf_token'] ?? '';
     if (!validateCsrfToken($csrfToken)) {
-        $errors[] = 'Invalid request. Please try again.';
+        $errors[] = 'Nevažeći zahtev. Pokušaj ponovo.';
     } else {
         if ($pendingEmail === '') {
             header('Location: /register');
@@ -44,9 +44,9 @@ if ($method === 'POST' && $path === '/verify/resend') {
 
         $emailSent = sendVerificationEmail($pendingEmail, $user['name'], $code);
         if ($emailSent) {
-            $successMsg = 'A new verification code has been sent to your email.';
+            $successMsg = 'Novi kod je poslat na tvoj email.';
         } else {
-            $errors[] = 'Failed to send email. Please try again shortly.';
+            $errors[] = 'Slanje emaila nije uspelo. Pokušaj ponovo za koji minut.';
         }
     }
 }
@@ -55,7 +55,7 @@ if ($method === 'POST' && $path === '/verify/resend') {
 if ($method === 'POST' && $path === '/verify') {
     $csrfToken = $_POST['csrf_token'] ?? '';
     if (!validateCsrfToken($csrfToken)) {
-        $errors[] = 'Invalid request. Please try again.';
+        $errors[] = 'Nevažeći zahtev. Pokušaj ponovo.';
     } else {
         if ($pendingEmail === '') {
             header('Location: /register');
@@ -80,11 +80,11 @@ if ($method === 'POST' && $path === '/verify') {
         // Check lock
         if ($user['verify_locked_until'] !== null && strtotime($user['verify_locked_until']) > time()) {
             $unlockTime = date('H:i', strtotime($user['verify_locked_until']));
-            $errors[] = "Too many failed attempts. Please try again after $unlockTime.";
+            $errors[] = "Previše neuspelih pokušaja. Pokušaj ponovo posle $unlockTime.";
         } else {
             // Check expiry
             if ($user['verification_expires_at'] === null || strtotime($user['verification_expires_at']) < time()) {
-                $errors[] = 'Verification code has expired. Please request a new one.';
+                $errors[] = 'Kod za potvrdu je istekao. Zatraži novi.';
             } elseif (!hash_equals((string) $user['verification_code'], $inputCode)) {
                 // Wrong code — increment attempts
                 $attempts = (int) $user['verify_attempts'] + 1;
@@ -93,13 +93,13 @@ if ($method === 'POST' && $path === '/verify') {
                     $pdo->prepare(
                         'UPDATE users SET verify_attempts = ?, verify_locked_until = ? WHERE id = ?'
                     )->execute([$attempts, $lockUntil, $user['id']]);
-                    $errors[] = 'Too many failed attempts. Your account is locked for 15 minutes.';
+                    $errors[] = 'Previše neuspelih pokušaja. Nalog je zaključan na 15 minuta.';
                 } else {
                     $pdo->prepare(
                         'UPDATE users SET verify_attempts = ? WHERE id = ?'
                     )->execute([$attempts, $user['id']]);
                     $remaining = 5 - $attempts;
-                    $errors[] = "Invalid code. You have $remaining attempt(s) remaining.";
+                    $errors[] = "Pogrešan kod. Imaš još $remaining pokušaj(a).";
                 }
             } else {
                 // Success
@@ -110,7 +110,7 @@ if ($method === 'POST' && $path === '/verify') {
                 )->execute([$user['id']]);
 
                 unset($_SESSION['pending_email']);
-                header('Location: /login?verified=1');
+                header('Location: /login?verified=1', true, 303);
                 exit;
             }
         }
@@ -118,7 +118,7 @@ if ($method === 'POST' && $path === '/verify') {
 }
 
 // Render form
-$pageTitle = 'Verify Email — ChatApp';
+$pageTitle = 'Potvrda emaila — MojChat';
 $bodyClass = 'auth-page';
 ob_start();
 require VIEWS . '/verify.php';

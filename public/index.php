@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+// Buffer output so redirects still work even if a warning/notice happens.
+ob_start();
+
 require_once __DIR__ . '/../src/config.php';
 
 // Secure session cookie settings before session_start
@@ -46,7 +49,7 @@ match (true) {
 
     default => (function () {
         http_response_code(404);
-        $pageTitle = '404 — ChatApp';
+        $pageTitle = '404 — MojChat';
         $bodyClass = 'auth-page';
         ob_start();
         require VIEWS . '/404.php';
