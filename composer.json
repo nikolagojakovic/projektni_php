@@ -1,0 +1,14 @@
+{
+    "name": "chat-app/chat-app",
+    "description": "Simple PHP Chat App",
+    "require": {
+        "php": ">=8.2",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "autoload": {
+        "files": ["src/config.php"]
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}
