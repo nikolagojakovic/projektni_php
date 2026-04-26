@@ -1,13 +1,8 @@
-FROM php:8.2-apache
+FROM php:8.2-fpm-alpine
 
-RUN apt-get update && apt-get install -y \
-    libpq-dev zip unzip git \
+RUN apk add --no-cache nginx libpq-dev \
     && docker-php-ext-install pdo pdo_pgsql \
-    && rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf \
-    && ln -s /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load \
-    && ln -s /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf \
-    && a2enmod rewrite \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/cache/apk/*
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -18,18 +13,14 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 COPY . .
 
-RUN printf '<VirtualHost *:80>\n\
-    DocumentRoot /var/www/html/public\n\
-    <Directory /var/www/html/public>\n\
-        AllowOverride All\n\
-        Require all granted\n\
-        Options -Indexes\n\
-    </Directory>\n\
-</VirtualHost>\n' > /etc/apache2/sites-available/000-default.conf
+COPY nginx.conf.template /etc/nginx/http.d/default.conf.template
+RUN rm -f /etc/nginx/http.d/default.conf
+
+RUN chown -R www-data:www-data /var/www/html
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
-    && chown -R www-data:www-data /var/www/html
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 8080
+
 CMD ["/usr/local/bin/docker-entrypoint.sh"]
