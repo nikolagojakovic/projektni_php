@@ -68,7 +68,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['pending_email'] = $email;
 
             if (!$emailSent) {
-                $_SESSION['email_warning'] = 'Nismo uspeli da pošaljemo email za potvrdu. Koristi dugme "Pošalji ponovo" na sledećoj stranici.';
+                $msg = 'Nismo uspeli da pošaljemo email za potvrdu. Koristi dugme "Pošalji ponovo" na sledećoj stranici.';
+                if (env('APP_ENV', 'production') !== 'production') {
+                    $detail = getMailerLastError();
+                    if ($detail !== '') {
+                        $msg .= ' Detalji: ' . $detail;
+                    }
+                }
+                $_SESSION['email_warning'] = $msg;
             }
 
             header('Location: /verify', true, 303);

@@ -5,8 +5,21 @@ declare(strict_types=1);
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 
+function setMailerLastError(string $message): void
+{
+    $GLOBALS['__MAILER_LAST_ERROR'] = $message;
+    error_log($message);
+}
+
+function getMailerLastError(): string
+{
+    return (string) ($GLOBALS['__MAILER_LAST_ERROR'] ?? '');
+}
+
 function sendVerificationEmail(string $email, string $name, string $code): bool
 {
+    $GLOBALS['__MAILER_LAST_ERROR'] = '';
+
     $resendKey = (string) env('RESEND_API_KEY', '');
     if ($resendKey !== '') {
         return sendVerificationEmailViaResendApi($resendKey, $email, $name, $code);
@@ -37,7 +50,7 @@ function sendVerificationEmail(string $email, string $name, string $code): bool
         $mail->send();
         return true;
     } catch (\Exception $e) {
-        error_log('Mailer error: ' . $e->getMessage());
+        setMailerLastError('Mailer error (SMTP): ' . $e->getMessage());
         return false;
     }
 }
@@ -47,12 +60,12 @@ function sendVerificationEmailViaResendApi(string $apiKey, string $email, string
     $fromEmail = (string) env('SMTP_FROM', '');
     $fromName  = (string) env('SMTP_FROM_NAME', 'MojChat');
     if ($fromEmail === '') {
-        error_log('Mailer error: SMTP_FROM must be set when using RESEND_API_KEY.');
+        setMailerLastError('Mailer error (Resend API): SMTP_FROM mora biti podešen.');
         return false;
     }
 
     if (!function_exists('curl_init')) {
-        error_log('Mailer error: cURL extension is required for RESEND_API_KEY sending.');
+        setMailerLastError('Mailer error (Resend API): PHP cURL ekstenzija nije dostupna.');
         return false;
     }
 
@@ -82,12 +95,12 @@ function sendVerificationEmailViaResendApi(string $apiKey, string $email, string
     curl_close($ch);
 
     if ($body === false) {
-        error_log('Mailer error (Resend API): ' . $err);
+        setMailerLastError('Mailer error (Resend API): ' . $err);
         return false;
     }
 
     if ($codeHttp < 200 || $codeHttp >= 300) {
-        error_log('Mailer error (Resend API): HTTP ' . $codeHttp . ' body=' . $body);
+        setMailerLastError('Mailer error (Resend API): HTTP ' . $codeHttp . ' body=' . $body);
         return false;
     }
 

@@ -46,7 +46,14 @@ if ($method === 'POST' && $path === '/verify/resend') {
         if ($emailSent) {
             $successMsg = 'Novi kod je poslat na tvoj email.';
         } else {
-            $errors[] = 'Slanje emaila nije uspelo. Pokušaj ponovo za koji minut.';
+            $msg = 'Slanje emaila nije uspelo. Pokušaj ponovo za koji minut.';
+            if (env('APP_ENV', 'production') !== 'production') {
+                $detail = getMailerLastError();
+                if ($detail !== '') {
+                    $msg .= ' Detalji: ' . $detail;
+                }
+            }
+            $errors[] = $msg;
         }
     }
 }
