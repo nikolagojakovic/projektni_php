@@ -1,7 +1,8 @@
 FROM php:8.2-fpm-alpine
 
-RUN apk add --no-cache nginx libpq-dev \
-    && docker-php-ext-install pdo pdo_pgsql \
+RUN apk add --no-cache nginx libpq-dev curl-dev ca-certificates \
+    && update-ca-certificates \
+    && docker-php-ext-install pdo pdo_pgsql curl \
     && rm -rf /var/cache/apk/*
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
