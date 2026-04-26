@@ -27,7 +27,9 @@ RUN printf '<VirtualHost *:80>\n\
     </Directory>\n\
 </VirtualHost>\n' > /etc/apache2/sites-available/000-default.conf
 
-RUN chown -R www-data:www-data /var/www/html
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+    && chown -R www-data:www-data /var/www/html
 
 EXPOSE 80
-CMD ["apache2-foreground"]
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
