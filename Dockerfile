@@ -3,7 +3,8 @@ FROM php:8.2-apache
 RUN apt-get update && apt-get install -y \
     libpq-dev zip unzip git \
     && docker-php-ext-install pdo pdo_pgsql \
-    && a2enmod rewrite \
+    && a2dismod mpm_event mpm_worker 2>/dev/null || true \
+    && a2enmod mpm_prefork rewrite \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
